@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+</head>
+<body>
+    <div id="g_id_onload"
+        data-client_id="YOUR_CLIENT_ID_HERE"
+        data-context="signin"
+        data-ux_mode="popup"
+        data-callback="handleCredentialResponse"
+        data-auto_prompt="false">
+    </div>
+
+    <div class="g_id_signin"
+        data-type="standard"
+        data-shape="pill"
+        data-theme="filled_blue"
+        data-text="signin_with"
+        data-size="large"
+        data-logo_alignment="left"
+        data-width="50px"
+        style="position: absolute;
+        top: 500px;
+        left:140px ;
+        margin-top: -10px;
+        margin-left: -10px;
+        padding: 0px;">
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            function handleCredentialResponse(response) {
+                try {
+                    const responsePayload = decodeJwtResponse(response.credential);
+                    console.log("ID: " + responsePayload.sub);
+                    console.log("Full name: " + responsePayload.name);
+                    console.log("Given Name: " + responsePayload.given_name);
+                    console.log("Family Name: " + responsePayload.family_name);
+                    console.log("Image URL: " + responsePayload.picture);
+                    console.log("Email: " + responsePayload.email);
+                    // Call the API endpoint here
+                    callApiEndpoint(response.credential);
+                } catch (error) {
+                    console.error("Failed to decode JWT payload:", error);
+                }
+            }
+
+            function decodeJwtResponse(data){
+                var tokens = data.split(".");
+                return JSON.parse(atob(tokens[1]));
+            }
+
+            function callApiEndpoint(credential) {
+                var data = {
+                    "id_token": credential,
+                };
+                $.ajax({
+                    type: 'POST',
+                    url: 'YOUR_API_ENDPOINT_URL_HERE',
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
+                    success: function(response) {
+                        console.log("Successfully logged in:", response);
+                    },
+                    error: function(error) {
+                        console.error("Failed to log in:", error);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
